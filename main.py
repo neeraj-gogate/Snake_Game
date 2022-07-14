@@ -1,4 +1,3 @@
-from os import SCHED_RESET_ON_FORK
 import random, sys, pygame
 
 pygame.init()
