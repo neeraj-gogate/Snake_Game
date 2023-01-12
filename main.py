@@ -2,10 +2,10 @@ import random, sys, pygame
 
 pygame.init()
 
-#Sets score to zero
+#Initializes score to zero
 score = 0
 
-#RGB colors 
+#colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -21,8 +21,8 @@ WIDTH = pygame.display.Info().current_w // 10 * 10
 HEIGHT = pygame.display.Info().current_h // 10 * 10
 SIZE = WIDTH, HEIGHT
 SCREEN = pygame.display.set_mode(SIZE)
-SCOREX = 10
-SCOREY = 10
+SCORE_X = 10
+SCORE_Y = 10
 FONT = pygame.font.SysFont('arial', 32)
 CLOCK = pygame.time.Clock()
 
@@ -32,7 +32,6 @@ new_direction = direction
 
 #Class for Snake Object
 class Snake(object):
-  #gives snake properties
   def __init__(self):
     self.speed = 10
     self.overall_position = [60, 50]
@@ -40,7 +39,7 @@ class Snake(object):
     self.direction = 'right'
     self.new_direction = self.direction
 
-  #This function binds movements to certain keys
+    #This function binds movements to certain keys
   def handle_keys(self):
     key = pygame.key.get_pressed()
     if key is None:
@@ -48,21 +47,22 @@ class Snake(object):
     if key[pygame.K_LEFT] or key[pygame.K_a]:
       self.new_direction = 'left'
     if key[pygame.K_RIGHT] or key[pygame.K_d]:
-        return
-        #Add your code here! REMOVE THE RETURN
+      self.new_direction = 'right'
     if key[pygame.K_UP] or key[pygame.K_w]:
-        return
-      #Add your code here! REMOVE THE RETURN
+      self.new_direction = 'up'
     if key[pygame.K_DOWN] or key[pygame.K_s]:
-        return
-      #Add your code here! REMOVE THE RETURN
+      self.new_direction = 'down'
     self.check_direction()
 
-  #sees if the  
   def check_direction(self):
     if self.new_direction == 'left' and self.direction != 'right':
       self.direction = self.new_direction
-    #Add your code here!
+    elif self.new_direction == 'right' and self.direction != 'left':
+      self.direction = self.new_direction
+    elif self.new_direction == 'up' and self.direction != 'down':
+      self.direction = self.new_direction
+    elif self.new_direction == 'down' and self.direction != 'up':
+      self.direction = self.new_direction
 
     #This function controls the speed at which the snakes move at
   def move(self):
@@ -70,18 +70,18 @@ class Snake(object):
       self.overall_position[0] -= 10
     if self.direction == 'right':
       self.overall_position[0] += 10
-    #Now do up and down yourself!
+    if self.direction == 'up':
+      self.overall_position[1] -= 10
+    if self.direction == 'down':
+      self.overall_position[1] += 10
 
-  #put the snake on the screen
   def draw(self, surface):
     for pos in self.positions:
       pygame.draw.rect(SCREEN, PURPLE, pygame.Rect(pos[0], pos[1], 10, 10))
 
-  #good practice for getting speed. Don't worry about it that much....
   def get_speed(self):
     return self.speed
 
-  #when you eat an apple, 
   def growth(self, apple):
     global score
     self.positions.insert(0, list(self.overall_position))
@@ -93,11 +93,11 @@ class Snake(object):
       self.positions.pop()
 
   def death_check(self):
-    if self.overall_position[0] < 0 or self.overall_position[0] > width - 10:
+    if self.overall_position[0] < 0 or self.overall_position[0] > WIDTH - 10:
         game_over()
-
-    #Now do the height yourself!
-    for pos in self.positions:
+    if self.overall_position[1] < 0 or self.overall_position[1] > HEIGHT - 10:
+        game_over()
+    for pos in self.positions[1:]:
       if self.overall_position[0] == pos[0] and self.overall_position[1] == pos[1]:
         game_over()
 
@@ -113,19 +113,18 @@ class Apple(object):
     return self.position
 
   def spawn(self):
-      return
-      #write this yourself! Hint: it's somewhere above...... REMOVE THE RETURN
+    self.position = [random.randrange(1, ((WIDTH-10)//10)) * 10,random.randrange(1, ((HEIGHT-30)//10)) * 10]
 
-#Game over...
+
 def game_over():
   global running
   running = False
 
-#Making objects
+
 snake = Snake()
 apple = Apple()
-
 running = True
+
 
 #This function allows us to display the score
 def display_score(x, y):
@@ -149,8 +148,9 @@ def main():
     snake.death_check()
     snake.draw(SCREEN)
     apple.draw(SCREEN)
-    display_score(SCOREX, SCOREY)
+    display_score(SCORE_X, SCORE_Y)
     pygame.display.update()
     CLOCK.tick(snake.get_speed())
+
 if __name__ == '__main__':
-    main()
+  main()
